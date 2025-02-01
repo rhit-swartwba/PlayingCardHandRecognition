@@ -1,3 +1,6 @@
+% Randomly place cards from one folder onto backgrounds
+% Using convention card naming of 2C_1.png to save labels 2C
+
 %img = imread('../BlaiseCards/2C.png'); 
 
 %cardFolder = '../BlaiseCards/';
@@ -28,7 +31,7 @@ for bgIdx = 1:1
     [bgHeight, bgWidth, ~] = size(bgImage);
     disp(['Processing background image: ', bgImagePath]);
     
-    for cardIdx = 1:2
+    for cardIdx = 1:4
         
         cardImagePath = fullfile(cardFolder, cardImages(cardIdx).name);
         [img, ~, alpha] = imread(cardImagePath);
@@ -42,38 +45,62 @@ for bgIdx = 1:1
         [cardHeight, cardWidth, ~] = size(cardImage);
         disp(['Processing card image: ', cardImagePath]);
         
-        if cardWidth > bgWidth || cardHeight > bgHeight
-            warning('Card image is larger than the background image. Skipping this card.');
+        % Rotation
+        angle = randi([-45, 45]);
+        
+        cardImageRotated = imrotate(cardImage, angle, 'bilinear', 'loose');
+        alphaRotated = imrotate(alpha, angle, 'bilinear', 'loose');
+        [cardHeightRotated, cardWidthRotated, ~] = size(cardImageRotated);
+        
+        % Ensure the rotated card fits within the background
+        if cardWidthRotated > bgWidth || cardHeightRotated > bgHeight
+            warning('Rotated card image is larger than the background image. Skipping this card.');
             continue;
         end
         
-        % Random position
-        xPos = randi([1, bgWidth - cardWidth + 1]);
-        yPos = randi([1, bgHeight - cardHeight + 1]);
+        % Random position for the rotated card
+        xPos = randi([1, bgWidth - cardWidthRotated + 1]);
+        yPos = randi([1, bgHeight - cardHeightRotated + 1]);
         
-        % Placing card
+        % Mask
+        alphaMaskRotated = double(alphaRotated) / 255;
+        
+        % Extract region from the background
+        bgRegion = bgImage(yPos:yPos+cardHeightRotated-1, xPos:xPos+cardWidthRotated-1, :);
+        
+        % Blend the rotated card 
+        blendedRegion = uint8(double(cardImageRotated) .* alphaMaskRotated + double(bgRegion) .* (1 - alphaMaskRotated));
+        
+        % Place the blended region back into the background
         combinedImage = bgImage;
-        combinedImage(yPos:yPos+cardHeight-1, xPos:xPos+cardWidth-1, :) = cardImage;
+        combinedImage(yPos:yPos+cardHeightRotated-1, xPos:xPos+cardWidthRotated-1, :) = blendedRegion;
         
-        % Calculate the relative bounding box [x_center, y_center, width, height]
-        x_center = (xPos + cardWidth/2) / bgWidth;
-        y_center = (yPos + cardHeight/2) / bgHeight;
-        width = cardWidth / bgWidth;
-        height = cardHeight / bgHeight;
-
-        % Rotation
+        % Bounding box
+        [rows, cols] = find(alphaRotated > 0);
+        x_min = min(cols);
+        x_max = max(cols);
+        y_min = min(rows);
+        y_max = max(rows);
+        
+        % Normalize and convert
+        x_center = (xPos + (x_min + x_max)/2) / bgWidth;
+        y_center = (yPos + (y_min + y_max)/2) / bgHeight;
+        width = (x_max - x_min) / bgWidth;
+        height = (y_max - y_min) / bgHeight;
 
         % Array of labels
         [~, imageName, ~] = fileparts(cardImagePath);
-        labels{cardIdx} = imageName;
+        imageNameParts = split(imageName, '_'); 
+        label = imageNameParts{1};
+        labels{cardIdx} = label;
         
         % Save image
-        outputImageName = fullfile(outputFolder, sprintf('combined_%d_%d.png', bgIdx, cardIdx));
+        outputImageName = fullfile(outputFolder, sprintf('%s_%d.png', imageName, bgIdx));
         imwrite(combinedImage, outputImageName);
         disp(['Saved combined image: ', outputImageName]);
         
         % Save bounding box
-        bboxFileName = fullfile(outputFolder, sprintf('combined_%d_%d.txt', bgIdx, cardIdx));
+        bboxFileName = fullfile(outputFolder, sprintf('%s_%d.txt', imageName, bgIdx));
         fid = fopen(bboxFileName, 'w');
         if fid == -1
             error('Could not open file for writing: %s', bboxFileName);

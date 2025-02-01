@@ -1,5 +1,5 @@
-imagePath = '../Results/combined_1_1.png';
-bboxFile = '../Results/combined_1_1.txt';
+imagePath = '../Results/10C_1.png';
+bboxFile = '../Results/10C_1.txt';
 
 img = imread(imagePath);
 
