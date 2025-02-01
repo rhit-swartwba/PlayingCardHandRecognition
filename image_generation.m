@@ -71,7 +71,7 @@ for bgIdx = 1:1
         % Blend the rotated card 
         blendedRegion = uint8(double(cardImageRotated) .* alphaMaskRotated + double(bgRegion) .* (1 - alphaMaskRotated));
         
-        % Place the blended region back into the background
+        % Place the blended region back
         combinedImage = bgImage;
         combinedImage(yPos:yPos+cardHeightRotated-1, xPos:xPos+cardWidthRotated-1, :) = blendedRegion;
         
@@ -105,7 +105,7 @@ for bgIdx = 1:1
         if fid == -1
             error('Could not open file for writing: %s', bboxFileName);
         end
-        fprintf(fid, '%d %f %f %f %f\n', cardIdx, x_center, y_center, width, height); 
+        fprintf(fid, '%s %f %f %f %f\n', label, x_center, y_center, width, height); 
         fclose(fid);
         disp(['Saved bounding box file: ', bboxFileName]);
     end
