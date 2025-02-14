@@ -8,3 +8,6 @@ The folder contains:
 - Performance metric plots for Precision and Recall and a Confusion Matrix
 - Loss/Precision curves over epochs in the results.png file
 - Logged metrics in the results.csv file
+
+
+The live detection script which does zoning and dealer vs player detection is [here](https://github.com/rhit-swartwba/PlayingCardHandRecognition/blob/main/live_zone_det.ipynb)
