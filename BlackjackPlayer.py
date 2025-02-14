@@ -19,8 +19,6 @@ class BlackjackPlayer:
          "2S": 2, "3S": 3, "4S": 4, "5S": 5, "6S": 6, "7S": 7, "8S": 8, "9S": 9, "10S": 10, "JS": 10, "QS": 10,
          "KS": 10, "AS": 1}
 
-    aces = ["AS", "AH", "AD", "AC"]
-
     command_map = {"S": "Stand", "H": "Hit", "D": "Double if allowed, otherwise Hit",
                    "Ds": "Double if allowed, otherwise Stand"}
 
@@ -28,9 +26,9 @@ class BlackjackPlayer:
         {
             21: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "S", 8: "S", 9: "S", 10: "S", 11: "S"},
             20: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "S", 8: "S", 9: "S", 10: "S", 11: "S"},
-            19: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
-            18: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
-            17: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
+            19: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "S", 8: "S", 9: "S", 10: "S", 11: "S"},
+            18: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "S", 8: "S", 9: "S", 10: "S", 11: "S"},
+            17: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "S", 8: "S", 9: "S", 10: "S", 11: "S"},
             16: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
             15: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
             14: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
@@ -76,6 +74,8 @@ class BlackjackPlayer:
         self.dealer_list = dealer_list
         self.player_list = player_list
         self.class_dict = class_dict
+
+        self.aces = [{v: k for k, v in self.class_dict.items()}.get(cardId) for cardId in ["AS", "AH", "AD", "AC"]]
 
     def play(self):
         if len(self.player_list) < 2:
@@ -123,6 +123,8 @@ class BlackjackPlayer:
                 return self.command_map[
                     self.soft_play[self.hand_hard_sum(list_no_aces)][self.hand_hard_sum(self.dealer_list)]
                 ]
+            if self.hand_hard_sum(self.player_list) > 21:
+                return "Defeat :("
             return self.command_map[
                 self.hard_play[self.hand_hard_sum(self.player_list)][self.hand_hard_sum(self.dealer_list)]
             ]
