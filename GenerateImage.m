@@ -1,4 +1,4 @@
-function [img, data] = GenerateImage(bgImage, imgList, alphaList, idList, style, scalingMin, scalingMax)
+function [img, data, numReturnedCards] = GenerateImage(bgImage, imgList, alphaList, idList, style, scalingMin, scalingMax)
 
     numCards = length(imgList);
     [bgHeight, bgWidth, ~] = size(bgImage);
@@ -11,6 +11,8 @@ function [img, data] = GenerateImage(bgImage, imgList, alphaList, idList, style,
     aspectRatio = cardWidth / cardHeight;
     newCardWidth = round(newCardHeight * aspectRatio);
     maxDist = floor(sqrt(newCardHeight^2 + newCardWidth^2));
+
+    counter = 0;
 
     while 1
         % Random initial rotation
@@ -44,6 +46,15 @@ function [img, data] = GenerateImage(bgImage, imgList, alphaList, idList, style,
                 xPos = randi([xmin, xmax]);
                 yPos = randi([ymin, ymax]);
                 break;
+            end
+        end
+        counter = counter + 1;
+        if counter == 50
+            if numCards == 1
+                error("Cards Too Big");
+            else
+                numCards = 1;
+                counter = 0;
             end
         end
     end
@@ -118,7 +129,35 @@ function [img, data] = GenerateImage(bgImage, imgList, alphaList, idList, style,
 
     end
 
-    img = bgImage;
+    bgImage = im2double(bgImage);
+
+    % Generate random coloration offsets
+    colorShift = rand(1, 3) * 0.2 - 0.1;  % Random values between [-0.1, 0.1]
+    
+    for i = 1:3  % Iterate over R, G, B channels
+        bgImage(:,:,i) = bgImage(:,:,i) + colorShift(i);
+    end
+    bgImage = min(max(bgImage, 0), 1);  % Clip values to [0,1]
+
+
+    % Generate random shadow polygon
+    numPoints = randi([3, 8]);  % Random number of vertices (3-8 for variety)
+    x = randi([1, bgWidth], 1, numPoints);  % Random x-coordinates
+    y = randi([1, bgHeight], 1, numPoints);  % Random y-coordinates
+    
+    % Create a shadow mask
+    shadowMask = poly2mask(x, y, bgHeight, bgWidth);
+    shadowMask = imgaussfilt(double(shadowMask), 15);  % Adjust sigma for softness
+    
+    % Shadow intensity (0 = completely black, 1 = no change)
+    shadowStrength = 0.5 * rand;  % Adjust for darker or lighter shadow
+    
+    for i = 1:3  % Apply to all color channels
+        bgImage(:,:,i) = bgImage(:,:,i) .* (1 - shadowStrength * shadowMask);
+    end
+
+    numReturnedCards = numCards;
+    img = uint8(bgImage * 255);
 end
 
 % bgImage = imread('BackgroundsResized/OIP.jpg');

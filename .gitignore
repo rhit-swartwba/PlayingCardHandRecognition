@@ -3,3 +3,7 @@
 /Backgrounds
 /BackgroundsResized
 /Results
+/datasets
+/card_model/test_metrics
+/card_model/test_predictions
+/card_model/validation_metrics
