@@ -22,6 +22,8 @@ class BlackjackPlayer:
     command_map = {"S": "Stand", "H": "Hit", "D": "Double if allowed, otherwise Hit",
                    "Ds": "Double if allowed, otherwise Stand"}
 
+    aces = ["AS", "AH", "AD", "AC"]
+
     hard_play = \
         {
             21: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "S", 8: "S", 9: "S", 10: "S", 11: "S"},
@@ -75,25 +77,26 @@ class BlackjackPlayer:
         self.player_list = player_list
         self.class_dict = class_dict
 
-        self.aces = [{v: k for k, v in self.class_dict.items()}.get(cardId) for cardId in ["AS", "AH", "AD", "AC"]]
-
     def play(self):
-        if len(self.player_list) < 2:
+        player_card_list = [self.class_dict[card] for card in self.player_list]
+        dealer_card_list = [self.class_dict[card] for card in self.dealer_list]
+
+        if len(player_card_list) < 2:
             return "Missing player cards"
 
-        if len(self.dealer_list) == 0:
+        if len(dealer_card_list) == 0:
             return "Waiting on dealer"
 
-        if len(self.dealer_list) >= 2:
-            if self.hand_hard_sum(self.player_list) > 21:
-                player_val = self.hand_soft_sum(self.player_list)
+        if len(dealer_card_list) >= 2:
+            if self.hand_hard_sum(player_card_list) > 21:
+                player_val = self.hand_soft_sum(player_card_list)
             else:
-                player_val = self.hand_hard_sum(self.player_list)
+                player_val = self.hand_hard_sum(player_card_list)
 
-            if self.hand_hard_sum(self.dealer_list) > 21:
-                dealer_val = self.hand_soft_sum(self.dealer_list)
+            if self.hand_hard_sum(dealer_card_list) > 21:
+                dealer_val = self.hand_soft_sum(dealer_card_list)
             else:
-                dealer_val = self.hand_hard_sum(self.dealer_list)
+                dealer_val = self.hand_hard_sum(dealer_card_list)
 
             if player_val > 21:
                 return "Defeat :("
@@ -108,25 +111,25 @@ class BlackjackPlayer:
             else:
                 return "Defeat :("
 
-        if len(self.player_list) == 2:
-            if self.hand_hard_sum(self.player_list) == 21:
+        if len(player_card_list) == 2:
+            if self.hand_hard_sum(player_card_list) == 21:
                 return "BLACKJACK!"
-            if self.player_list[0] == self.player_list[1]:
-                if self.split[self.hand_hard_sum(self.player_list[0])][self.hand_hard_sum(self.dealer_list[0])] == "Y":
+            if self.hard_value_map[player_card_list[0]] == self.hard_value_map[player_card_list[1]]:
+                if self.split[self.hard_value_map[player_card_list[0]][self.hard_value_map[dealer_card_list[0]]]] == "Y":
                     return "Split"
 
-        if len(self.player_list) >= 2:
-            if self.hand_soft_sum(self.player_list) > 21:
+        if len(player_card_list) >= 2:
+            if self.hand_soft_sum(player_card_list) > 21:
                 return "Defeat :("
-            if any(card in self.player_list for card in self.aces):
-                list_no_aces = [card for card in self.player_list if card not in self.aces]
+            if any(card in player_card_list for card in self.aces):
+                list_no_aces = [card for card in player_card_list if card not in self.aces]
                 return self.command_map[
-                    self.soft_play[self.hand_hard_sum(list_no_aces)][self.hand_hard_sum(self.dealer_list)]
+                    self.soft_play[self.hand_hard_sum(list_no_aces)][self.hand_hard_sum(dealer_card_list)]
                 ]
-            if self.hand_hard_sum(self.player_list) > 21:
+            if self.hand_hard_sum(player_card_list) > 21:
                 return "Defeat :("
             return self.command_map[
-                self.hard_play[self.hand_hard_sum(self.player_list)][self.hand_hard_sum(self.dealer_list)]
+                self.hard_play[self.hand_hard_sum(player_card_list)][self.hand_hard_sum(dealer_card_list)]
             ]
 
         return "Unknown"
@@ -134,11 +137,11 @@ class BlackjackPlayer:
     def hand_hard_sum(self, cards):
         sum = 0
         for card in cards:
-            sum += self.hard_value_map[self.class_dict[card]]
+            sum += self.hard_value_map[card]
         return sum
 
     def hand_soft_sum(self, cards):
         sum = 0
         for card in cards:
-            sum += self.soft_value_map[self.class_dict[card]]
+            sum += self.soft_value_map[card]
         return sum
