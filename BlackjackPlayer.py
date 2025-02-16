@@ -37,7 +37,7 @@ class BlackjackPlayer:
             13: {2: "S", 3: "S", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
             12: {2: "H", 3: "H", 4: "S", 5: "S", 6: "S", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
             11: {2: "D", 3: "D", 4: "D", 5: "D", 6: "D", 7: "D", 8: "D", 9: "D", 10: "D", 11: "D"},
-            10: {2: "D", 3: "D", 4: "D", 5: "D", 6: "D", 7: "D", 8: "D", 9: "D", 10: "S", 11: "S"},
+            10: {2: "D", 3: "D", 4: "D", 5: "D", 6: "D", 7: "D", 8: "D", 9: "D", 10: "H", 11: "H"},
             9: {2: "H", 3: "D", 4: "D", 5: "D", 6: "D", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
             8: {2: "H", 3: "H", 4: "H", 5: "H", 6: "H", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
             7: {2: "H", 3: "H", 4: "H", 5: "H", 6: "H", 7: "H", 8: "H", 9: "H", 10: "H", 11: "H"},
@@ -123,7 +123,7 @@ class BlackjackPlayer:
                 return "Defeat :("
             if any(card in player_card_list for card in self.aces):
                 list_no_aces = [card for card in player_card_list if card not in self.aces]
-                if self.hand_hard_sum(list_no_aces) > 9:
+                if self.hand_soft_sum(player_card_list) > 10:
                     return self.command_map[
                     self.hard_play[self.hand_soft_sum(player_card_list)][self.hand_hard_sum(dealer_card_list)]
                 ]
