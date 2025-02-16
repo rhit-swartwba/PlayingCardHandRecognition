@@ -115,7 +115,7 @@ class BlackjackPlayer:
             if self.hand_hard_sum(player_card_list) == 21:
                 return "BLACKJACK!"
             if self.hard_value_map[player_card_list[0]] == self.hard_value_map[player_card_list[1]]:
-                if self.split[self.hard_value_map[player_card_list[0]][self.hard_value_map[dealer_card_list[0]]]] == "Y":
+                if self.split[self.hard_value_map[player_card_list[0]]][self.hard_value_map[dealer_card_list[0]]] == "Y":
                     return "Split"
 
         if len(player_card_list) >= 2:
