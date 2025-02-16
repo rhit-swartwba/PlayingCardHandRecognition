@@ -78,8 +78,8 @@ class BlackjackPlayer:
         self.class_dict = class_dict
 
     def play(self):
-        player_card_list = [self.class_dict[card] for card in self.player_list]
-        dealer_card_list = [self.class_dict[card] for card in self.dealer_list]
+        player_card_list = [self.class_dict[card] for card in self.player_list if not self.class_dict[card]=="R"]
+        dealer_card_list = [self.class_dict[card] for card in self.dealer_list if not self.class_dict[card]=="R"]
 
         if len(player_card_list) < 2:
             return "Missing player cards"
@@ -123,9 +123,14 @@ class BlackjackPlayer:
                 return "Defeat :("
             if any(card in player_card_list for card in self.aces):
                 list_no_aces = [card for card in player_card_list if card not in self.aces]
-                return self.command_map[
-                    self.soft_play[self.hand_hard_sum(list_no_aces)][self.hand_hard_sum(dealer_card_list)]
+                if self.hand_hard_sum(list_no_aces) > 9:
+                    return self.command_map[
+                    self.hard_play[self.hand_soft_sum(player_card_list)][self.hand_hard_sum(dealer_card_list)]
                 ]
+                else:
+                    return self.command_map[
+                        self.soft_play[self.hand_hard_sum(list_no_aces)][self.hand_hard_sum(dealer_card_list)]
+                    ]
             if self.hand_hard_sum(player_card_list) > 21:
                 return "Defeat :("
             return self.command_map[
