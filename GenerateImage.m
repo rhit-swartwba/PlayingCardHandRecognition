@@ -24,8 +24,8 @@ function [img, data, numReturnedCards] = GenerateImage(bgImage, imgList, alphaLi
         cover = coverPercent / 100;
         xInc = floor(cos(deg2rad(angle)) * newCardWidth * cover);
         yInc = floor(-sin(deg2rad(angle)) * newCardHeight * cover);
-        xRand = randi([-bgWidth*.1, bgWidth*.1]);
-        yRand = randi([-bgHeight*.1, bgHeight*.1]);
+        xRand = randi([0, maxDist]);
+        yRand = randi([0, maxDist]);
     
         if style == 1 || style == 2
             xmin = max(-xRand*numCards, 1);
