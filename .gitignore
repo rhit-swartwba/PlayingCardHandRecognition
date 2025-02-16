@@ -7,3 +7,6 @@
 /card_model/test_metrics
 /card_model/test_predictions
 /card_model/validation_metrics
+/card_model_back/test_metrics
+/card_model_back/test_predictions
+/card_model_back/validation_metrics
