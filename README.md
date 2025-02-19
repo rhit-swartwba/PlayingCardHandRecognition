@@ -10,7 +10,7 @@ To generate a dataset run:
 
 To train a the YOLOv8 model run:
 - [Data Preparation](./DataPreparation.ipynb) : Seperates dataset into a training, validation, and testing set
-- [YOLOv8](./YOLOv8.ipynb) : Trains the YOLOv8m model on dataset
+- [YOLOv8](./YoloV8.ipynb) : Trains the YOLOv8m model on dataset
 
 To run the live Blackjack detector:
 - [Blackjack](./Blackjack.ipynb) : Runs application that uses the trained YOLO model to help player win Blackjack
